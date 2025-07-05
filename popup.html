@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOMTree Explorer+</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">DOMTree Explorer+</h1>
+            <p class = "subtitle">Explore and inspect the DOM structure</p>
+
+        </header>
+
+        <main class="main">
+            <div class="controls">
+                <button id="loadDOM" class="btn btn-primary">Load DOM Tree</button>
+                <button id="clearHighlight" class="btn btn-secondary">Clear Highlight</button>
+            </div>
+
+            <div class="status">
+                <p id="statusMessage">Ready to explore DOM</p>
+            </div>
+            <div class="dom-tree" id="domTree">
+                <p class="placeholder">Click "Load DOM Tree" to start exploring</p>
+            </div>
+
+        </main>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
