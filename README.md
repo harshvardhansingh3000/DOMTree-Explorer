@@ -1,67 +1,46 @@
-# DOM Tree Explorer & Annotator – Project Plan
+# DOMTree Explorer+
 
-## Project Purpose
-A Chrome extension that lets users visually explore, inspect, and annotate the DOM tree of any web page. It provides a sidebar or popup UI to navigate the DOM, highlight elements, add personal notes, and generate selector code for any element.
+A Chrome extension for visualizing, exploring, and annotating the DOM tree of any web page. Designed for both developers and non-developers, with a modern, user-friendly UI.
 
----
+## Features
 
-## Planned Features
+- **DOM Tree Visualization**: Explore the structure of any web page in a clean, expandable tree view.
+- **Element Highlighting**: Click any node to highlight the corresponding element on the page.
+- **Details Panel**: See tag, id, class, selector, and children count for any element. Copy the unique selector with one click.
+- **Jump to Element**: Instantly scroll the page to the selected element with a single button.
+- **Search/Filter**: Quickly find elements by tag, id, class, or text content. Matching nodes are highlighted and auto-expanded.
+- **Breadcrumbs Navigation**: See and click the path from the root to the selected element for easy navigation.
+- **User-Friendly for Non-Developers**: Inline guides, tooltips, and a simple interface make it easy for anyone to inspect the DOM.
+- **Modern UI**: Responsive, accessible, and visually appealing design.
 
-### 1. DOM Tree Visualization
-- Sidebar or popup UI with a collapsible tree view of the current page's DOM.
-- Expand/collapse nodes to navigate deeply nested structures.
-- Clicking a node highlights the corresponding element on the page.
+## How to Use
 
-### 2. Element Highlighting
-- Hovering over a node highlights the element on the page.
-- Clicking a node scrolls to and outlines the element.
+1. **Install the Extension** and pin it to your Chrome toolbar.
+2. **Open any web page** (not a Chrome internal page).
+3. **Click the DOMTree Explorer+ icon** to open the popup.
+4. **Click "Load DOM Tree"** to visualize the page's DOM structure.
+5. **Search/Filter**: Use the search bar to find elements by tag, id, class, or text. Matching nodes are highlighted and expanded.
+6. **Explore the Tree**: Expand/collapse nodes to navigate. Click any node to highlight the element and see its details.
+7. **Details Panel**: View tag, id, class, selector, and children count. Use the "Copy Selector" button to copy the unique selector.
+8. **Jump to Element**: Click the "Jump to Element" button to scroll the page to the selected element.
+9. **Breadcrumbs**: Use the breadcrumbs in the details panel to quickly jump to ancestor elements.
+10. **Tooltips & Guides**: Hover over buttons and features for helpful tooltips. Read the inline guide at the top for quick instructions.
 
-### 3. Node Details
-- Show tag, classes, id, and attributes for the selected node.
+## Why Use DOMTree Explorer+ Instead of Chrome DevTools?
 
-### 4. Annotation/Notes
-- Add, edit, or delete personal notes for any DOM node.
-- Notes are saved using chrome.storage, mapped to the page URL and a unique selector for the element.
-- Annotated nodes are visually marked in the tree.
+- **Popup UI**: Always accessible, doesn't cover your page.
+- **Simpler for Non-Developers**: No overwhelming panels or jargon.
+- **Custom Features**: One-click selector copy, jump to element, breadcrumbs, and more.
+- **Great for QA, documentation, and teaching**: Annotate, explore, and share DOM insights easily.
 
-### 5. Selector Code Generator
-- Display the best JavaScript selector code (e.g., `document.getElementById`, `document.querySelector`) for the selected element.
-- "Copy" button to copy the code to clipboard.
+## Roadmap
 
-### 6. Search & Filter
-- Search for elements by tag, class, id, or text content.
-- Filter to show only elements with notes or matching criteria.
-
-### 7. User Experience
-- Modern, responsive UI (CSS framework optional).
-- Tooltips for buttons and features.
-- (Optional) Keyboard navigation for the tree.
-
-### 8. Persistent Storage
-- All notes and user preferences are saved in chrome.storage (local or sync).
-
-### 9. Publishing
-- Prepare and optimize the extension for publishing on the Chrome Web Store.
-- Write a clear README and store listing description.
-
----
-
-## Technical Stack
-- Manifest V3 (service worker, content scripts, web accessible resources)
-- Content Script: DOM reading/highlighting, messaging
-- Sidebar/Popup: UI for DOM tree, notes, selector code
-- Background/Service Worker: Extension lifecycle, messaging
-- chrome.storage: For notes and preferences
-- CSS/JS for UI (framework optional)
-
----
-
-## Stretch Features (Optional)
-- Export/import notes
-- Share annotated DOM trees
-- Show computed styles or event listeners for nodes
+- Element annotation/notes
+- Export/import tree or annotations
 - Dark mode
+- Accessibility checks
+- More advanced search/filter options
 
 ---
 
-This document will be updated as we progress. Next, we'll start with the initial project setup and structure. Let me know when you're ready to begin! 
+**Enjoy exploring the DOM with ease!** 

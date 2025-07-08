@@ -22,7 +22,7 @@ function generateSelector(element){
         }
     }
     // Fallback: build path with nth-child
-    let path = []; //path – an array that will hold each step (later joined with “ > ”).
+    let path = []; //path – an array that will hold each step (later joined with " > ").
     let current = element;
     while (current && current !== document.body) {
         let selector = current.tagName.toLowerCase();
@@ -54,7 +54,7 @@ function generateSelector(element){
         current = current.parentNode;
     }
     
-    return path.join(' > '); // join the path with “ > ” to make it a string
+    return path.join(' > '); // join the path with " > " to make it a string
     
 }
 
@@ -94,11 +94,12 @@ function buildDOMTree(element, maxDepth = 20, currentDepth = 0){
 }
 
 // Function to highlight an element on the page
-function highlightElement(selector) {
+function highlightElement(selector, jump = false) {
     // Remove previous highlight
     if (currentHighlightedElement) {
         currentHighlightedElement.style.outline = '';
         currentHighlightedElement.style.backgroundColor = '';
+        currentHighlightedElement.removeAttribute('title');
     }
 
     // Find and highlight new element
@@ -106,10 +107,13 @@ function highlightElement(selector) {
     if (element) {
         element.style.outline = '2px solid #ff6b6b';
         element.style.backgroundColor = 'rgba(255, 107, 107, 0.1)';
+        element.setAttribute('title', 'Highlighted by DOMTree Explorer+');
         currentHighlightedElement = element;
     
-        // Scroll element into view
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Scroll element into view if requested
+        if (jump) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
 
         return true;
     }
@@ -149,7 +153,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             break;
             
         case 'highlightElement':
-            const success = highlightElement(request.selector);
+            const success = highlightElement(request.selector, request.jump);
             sendResponse({ success: success });
             break;
             

@@ -295,3 +295,63 @@ body {
     color: #856404;
     font-weight: bold;
 }
+
+.guide {
+    background: #e9ecef;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #555;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.search-bar input {
+    flex: 1;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    outline: none;
+    transition: border 0.2s;
+}
+.search-bar input:focus {
+    border: 1.5px solid #667eea;
+}
+
+.search-tooltip {
+    font-size: 16px;
+    color: #888;
+    cursor: help;
+}
+
+.breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 13px;
+    align-items: center;
+}
+.breadcrumb {
+    background: #f1f3f5;
+    border-radius: 4px;
+    padding: 2px 8px;
+    color: #495057;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid #e9ecef;
+}
+.breadcrumb:hover {
+    background: #ffe58f;
+    color: #856404;
+}
+.breadcrumb-sep {
+    color: #aaa;
+    margin: 0 2px;
+}

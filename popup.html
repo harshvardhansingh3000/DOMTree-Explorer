@@ -16,15 +16,26 @@
 
         <main class="main">
             <div class="controls">
-                <button id="loadDOM" class="btn btn-primary">Load DOM Tree</button>
-                <button id="clearHighlight" class="btn btn-secondary">Clear Highlight</button>
+                <button id="loadDOM" class="btn btn-primary" title="Load the DOM tree of the current page">Load DOM Tree</button>
+                <button id="clearHighlight" class="btn btn-secondary" title="Remove highlight from the page">Clear Highlight</button>
             </div>
 
             <div class="status">
                 <p id="statusMessage">Ready to explore DOM</p>
             </div>
 
-            <div id="detailsPanel" class="details-panel" style="display:none;"></div>
+            <div class="guide" style="margin-bottom:10px; color:#555; font-size:13px;">
+                <strong>How to use:</strong> Use the search bar to find elements by tag, id, class, or text. Click a node to see details and highlight it on the page. Use breadcrumbs to navigate ancestors. Tooltips are available on buttons and features.
+            </div>
+
+            <div id="detailsPanel" class="details-panel" style="display:none;">
+                <div id="breadcrumbs" class="breadcrumbs" style="margin-bottom:8px;"></div>
+            </div>
+
+            <div class="search-bar" style="margin-bottom:10px;">
+                <input id="searchInput" type="text" placeholder="Search tag, id, class, or text..." title="Type to filter or highlight elements in the DOM tree" style="width:90%;padding:6px;border-radius:4px;border:1px solid #ccc;">
+                <span class="search-tooltip" title="Type keywords to filter or highlight nodes. Matches tag, id, class, or text content." style="cursor:help; color:#888; margin-left:4px;">&#9432;</span>
+            </div>
 
             <div class="dom-tree" id="domTree">
                 <p class="placeholder">Click "Load DOM Tree" to start exploring</p>

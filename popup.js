@@ -10,6 +10,7 @@ const domTree = document.getElementById('domTree');
 let currentDOMData = null;
 let selectedNodeElement = null;
 let selectedNodeData = null;
+let searchTerm = '';
 
 // Update status message
 function updateStatus(message,isError = false){
@@ -47,6 +48,66 @@ async function sendMessageToContentScript(message) {
     }
 }
 
+// Utility: Recursively search/filter tree nodes
+function searchTree(node, term) {
+    if (!term) return { ...node, matched: false, children: node.children.map(child => searchTree(child, term)) };
+    const lowerTerm = term.toLowerCase();
+    const matches =
+        (node.tagName && node.tagName.toLowerCase().includes(lowerTerm)) ||
+        (node.id && node.id.toLowerCase().includes(lowerTerm)) ||
+        (node.className && node.className.toLowerCase().includes(lowerTerm)) ||
+        (node.textContent && node.textContent.toLowerCase().includes(lowerTerm));
+    const children = node.children.map(child => searchTree(child, term));
+    const childMatches = children.some(child => child.matched || (child.children && child.children.some(grand => grand.matched)));
+    return {
+        ...node,
+        matched: matches,
+        children,
+        expanded: matches || childMatches // auto-expand if match in subtree
+    };
+}
+
+// Render breadcrumbs for selected node
+function renderBreadcrumbs(node) {
+    const breadcrumbsDiv = document.getElementById('breadcrumbs');
+    if (!node || !currentDOMData) {
+        breadcrumbsDiv.innerHTML = '';
+        return;
+    }
+    // Find path from root to node
+    const path = [];
+    function findPath(current, target) {
+        if (current.selector === target.selector) {
+            path.push(current);
+            return true;
+        }
+        for (const child of current.children) {
+            if (findPath(child, target)) {
+                path.unshift(current);
+                return true;
+            }
+        }
+        return false;
+    }
+    findPath(currentDOMData, node);
+    // Render breadcrumbs
+    breadcrumbsDiv.innerHTML = '';
+    path.forEach((n, idx) => {
+        if (idx > 0) {
+            const sep = document.createElement('span');
+            sep.className = 'breadcrumb-sep';
+            sep.textContent = '›';
+            breadcrumbsDiv.appendChild(sep);
+        }
+        const crumb = document.createElement('span');
+        crumb.className = 'breadcrumb';
+        crumb.title = 'Click to select this ancestor node';
+        crumb.textContent = n.tagName + (n.id ? `#${n.id}` : '') + (n.className ? `.${n.className.split(' ')[0]}` : '');
+        crumb.onclick = () => selectTreeNode(null, n, true);
+        breadcrumbsDiv.appendChild(crumb);
+    });
+}
+
 // Show details in the details panel
 function showDetailsPanel(node) {
     const panel = document.getElementById('detailsPanel');
@@ -56,13 +117,17 @@ function showDetailsPanel(node) {
         return;
     }
     panel.style.display = 'flex';
-    panel.innerHTML = `
+    // Clear previous details except breadcrumbs
+    panel.innerHTML = '<div id="breadcrumbs" class="breadcrumbs" style="margin-bottom:8px;"></div>';
+    renderBreadcrumbs(node);
+    panel.innerHTML += `
         <div><span class="details-label">Tag:</span> <span>${node.tagName}</span></div>
         <div><span class="details-label">ID:</span> <span>${node.id ? node.id : '<none>'}</span></div>
         <div><span class="details-label">Class:</span> <span>${node.className ? node.className : '<none>'}</span></div>
         <div><span class="details-label">Selector:</span> <span id="selectorText">${node.selector}</span></div>
         <div><span class="details-label">Children:</span> <span>${node.childrenCount}</span></div>
-        <button class="copy-btn" id="copySelectorBtn">Copy Selector</button>
+        <button class="copy-btn" id="copySelectorBtn" title="Copy the unique selector for this element">Copy Selector</button>
+        <button class="copy-btn" id="jumpToElementBtn" title="Scroll the page to this element">Jump to Element</button>
     `;
     document.getElementById('copySelectorBtn').onclick = function() {
         const selector = node.selector;
@@ -71,6 +136,9 @@ function showDetailsPanel(node) {
             setTimeout(() => { this.textContent = 'Copy Selector'; }, 1200);
         });
     };
+    document.getElementById('jumpToElementBtn').onclick = function() {
+        highlightElement(node.selector, true); // true = jump
+    };
 }
 
 //Create a tree node element
@@ -78,15 +146,18 @@ function createTreeNode(node, depth = 0){
     const nodeElement = document.createElement('div');
     nodeElement.className = 'tree-node';
     nodeElement.style.paddingLeft = `${depth * 20}px`;
+    if (node.matched) nodeElement.style.background = '#ffe58f';
+    if (selectedNodeData && node.selector === selectedNodeData.selector) nodeElement.classList.add('selected');
 
     const nodeContent = document.createElement('div');
     nodeContent.className = 'node-content';
+    nodeContent.title = 'Click to select and highlight this element';
 
     // Create expand/collapse button for nodes with children
     if(node.hasChildren && node.children.length > 0){
         const expandBtn = document.createElement('span');
         expandBtn.className = 'expand-btn';
-        expandBtn.textContent = '▶';
+        expandBtn.textContent = node.expanded ? '▼' : '▶';
         expandBtn.onclick = (e) => {
             e.stopPropagation();
             toggleNode(nodeElement, expandBtn);
@@ -143,7 +214,7 @@ function createTreeNode(node, depth = 0){
     if(node.hasChildren && node.children.length > 0){
         const childrenContainer = document.createElement('div');
         childrenContainer.className = 'children-container';
-        childrenContainer.style.display = 'none';
+        childrenContainer.style.display = node.expanded ? 'block' : 'none';
 
         node.children.forEach(child =>{
             const childElement = createTreeNode(child, depth + 1);
@@ -167,26 +238,37 @@ function toggleNode(nodeElement, expandBtn) {
 }
 
 // Select a tree node and show details
-function selectTreeNode(nodeElement, nodeData) {
+function selectTreeNode(nodeElement, nodeData, fromBreadcrumb) {
     // Remove previous selection
     if (selectedNodeElement) {
         selectedNodeElement.classList.remove('selected');
     }
+    // Find the new nodeElement if fromBreadcrumb
+    if (fromBreadcrumb) {
+        // Find the DOM element in the tree
+        const allNodes = document.querySelectorAll('.tree-node');
+        for (const el of allNodes) {
+            if (el.textContent.includes(nodeData.tagName) && el.textContent.includes(nodeData.id || '') && el.textContent.includes(nodeData.className ? nodeData.className.split(' ')[0] : '')) {
+                nodeElement = el;
+                break;
+            }
+        }
+    }
     selectedNodeElement = nodeElement;
     selectedNodeData = nodeData;
-    nodeElement.classList.add('selected');
+    if (nodeElement) nodeElement.classList.add('selected');
     showDetailsPanel(nodeData);
 }
 
 // Highlight element on the page
-async function highlightElement(selector) {
+async function highlightElement(selector, jump = false) {
     try {
         updateStatus('Highlighting element...');
         const response = await sendMessageToContentScript({
             action: 'highlightElement',
-            selector: selector
+            selector: selector,
+            jump: jump
         });
-        
         if (response.success) {
             updateStatus('Element highlighted!');
         } else {
@@ -197,15 +279,13 @@ async function highlightElement(selector) {
     }
 }
 
-// Render DOM tree
+// Render DOM tree (with search/filter support)
 function renderDOMTree(domData) {
     domTree.innerHTML = '';
-    
     if (!domData) {
         domTree.innerHTML = '<p class="placeholder">No DOM data available</p>';
         return;
     }
-    
     // Add page info
     const pageInfo = document.createElement('div');
     pageInfo.className = 'page-info';
@@ -214,15 +294,12 @@ function renderDOMTree(domData) {
         <p class="page-url">${domData.pageUrl || ''}</p>
     `;
     domTree.appendChild(pageInfo);
-    
     // Create tree container
     const treeContainer = document.createElement('div');
     treeContainer.className = 'tree-container';
-    
     // Render the root node
     const rootNode = createTreeNode(domData);
     treeContainer.appendChild(rootNode);
-    
     domTree.appendChild(treeContainer);
 }
 
@@ -231,13 +308,15 @@ async function loadDOMTree(){
     try{
         updateStatus("Loading DOM Tree...");
         loadDOMBtn.classList.add('loading');
-
         const response = await sendMessageToContentScript({
             action: 'getDOMStructure',
         });
         if(response.success){
             currentDOMData = response.data;
-            renderDOMTree(response.data);
+            // If search is active, filter tree
+            let treeToRender = currentDOMData;
+            if (searchTerm) treeToRender = searchTree(currentDOMData, searchTerm);
+            renderDOMTree(treeToRender);
             updateStatus("DOM Tree loaded successfully");
         }else{
             updateStatus("Failed to load DOM Tree",true);
@@ -247,6 +326,18 @@ async function loadDOMTree(){
     }finally{
         loadDOMBtn.classList.remove('loading');
     }
+}
+
+// Search/filter event
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        if (!currentDOMData) return;
+        let treeToRender = currentDOMData;
+        if (searchTerm) treeToRender = searchTree(currentDOMData, searchTerm);
+        renderDOMTree(treeToRender);
+    });
 }
 
 // clear highlight
