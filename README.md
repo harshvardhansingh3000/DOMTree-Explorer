@@ -42,3 +42,11 @@ A Chrome extension for visualizing, exploring, and annotating the DOM tree of an
 - **Great for QA, documentation, and teaching**: Annotate, explore, and share DOM insights easily.
 
 **Enjoy exploring the DOM with ease!** 
+
+## Screenshots
+
+![Light Mode](screenshots/ss1.png)
+![Dark Mode](screenshots/ss2.png)
+![DOM Tree](screenshots/ss3.png)
+![Element Details](screenshots/ss4.png)
+![Search/Filter](screenshots/ss5.png)
