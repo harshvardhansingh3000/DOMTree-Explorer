@@ -355,3 +355,118 @@ body {
     color: #aaa;
     margin: 0 2px;
 }
+
+/* Dark mode styles */
+.dark-mode, .dark-mode body, .dark-mode .container {
+    background-color: #181a1b !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode .header {
+    background: linear-gradient(135deg, #232526 0%, #414345 100%) !important;
+    color: #f8f9fa !important;
+}
+.dark-mode .main {
+    background: #181a1b !important;
+}
+.dark-mode .status {
+    background-color: #232526 !important;
+    border-left: 4px solid #ffe58f !important;
+    color: #ffe58f !important;
+}
+.dark-mode .dom-tree {
+    background-color: #232526 !important;
+    border-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode .tree-container {
+    background-color: #232526 !important;
+    border-color: #333 !important;
+}
+.dark-mode .tree-node.selected > .node-content {
+    background-color: #333c4a !important;
+    color: #ffe58f !important;
+}
+.dark-mode .node-content {
+    background: none !important;
+    color: #e0e0e0 !important;
+}
+.dark-mode .expand-btn, .dark-mode .spacer {
+    color: #aaa !important;
+}
+.dark-mode .tag-name {
+    color: #ffb86c !important;
+}
+.dark-mode .element-id {
+    color: #8be9fd !important;
+}
+.dark-mode .element-class {
+    color: #50fa7b !important;
+}
+.dark-mode .children-count {
+    color: #bfbfbf !important;
+}
+.dark-mode .details-panel {
+    background-color: #232526 !important;
+    border-color: #333 !important;
+    color: #ffe58f !important;
+}
+.dark-mode .copy-btn {
+    background: #333c4a !important;
+    color: #ffe58f !important;
+    border-color: #ffe58f !important;
+}
+.dark-mode .copy-btn:hover {
+    background: #444c5a !important;
+}
+.dark-mode .guide {
+    background: #232526 !important;
+    color: #bfbfbf !important;
+}
+.dark-mode .search-bar input {
+    background: #232526 !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #444 !important;
+}
+.dark-mode .search-bar input:focus {
+    border: 1.5px solid #ffe58f !important;
+}
+.dark-mode .search-tooltip {
+    color: #ffe58f !important;
+}
+.dark-mode .breadcrumbs {
+    color: #ffe58f !important;
+}
+.dark-mode .breadcrumb {
+    background: #333c4a !important;
+    color: #ffe58f !important;
+    border-color: #ffe58f !important;
+}
+.dark-mode .breadcrumb:hover {
+    background: #444c5a !important;
+    color: #fffbe6 !important;
+}
+.dark-mode .breadcrumb-sep {
+    color: #ffe58f !important;
+}
+
+/* Dark mode toggle styles */
+.dark-mode-toggle input[type="checkbox"] {
+    accent-color: #ffe58f;
+}
+
+/* Accessibility warnings */
+.accessibility-warnings {
+    color: #dc3545;
+    background: #fff0f0;
+    border: 1px solid #dc3545;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: none;
+}
+.dark-mode .accessibility-warnings {
+    background: #3a2323;
+    color: #ff6b6b;
+    border-color: #ff6b6b;
+}

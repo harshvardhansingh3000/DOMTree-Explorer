@@ -11,7 +11,12 @@
         <header class="header">
             <h1 class="title">DOMTree Explorer+</h1>
             <p class = "subtitle">Explore and inspect the DOM structure</p>
-
+            <div class="dark-mode-toggle" style="position:absolute;top:18px;right:18px;">
+                <label title="Toggle dark mode" style="cursor:pointer;display:flex;align-items:center;gap:4px;">
+                    <input type="checkbox" id="darkModeSwitch" aria-label="Toggle dark mode">
+                    <span id="darkModeIcon" style="font-size:18px;">🌙</span>
+                </label>
+            </div>
         </header>
 
         <main class="main">
@@ -30,6 +35,7 @@
 
             <div id="detailsPanel" class="details-panel" style="display:none;">
                 <div id="breadcrumbs" class="breadcrumbs" style="margin-bottom:8px;"></div>
+                <div id="accessibilityWarnings" class="accessibility-warnings" style="margin-bottom:8px;"></div>
             </div>
 
             <div class="search-bar" style="margin-bottom:10px;">

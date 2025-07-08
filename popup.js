@@ -12,6 +12,92 @@ let selectedNodeElement = null;
 let selectedNodeData = null;
 let searchTerm = '';
 
+// Dark mode toggle logic
+const container = document.querySelector('.container');
+const darkModeSwitch = document.getElementById('darkModeSwitch');
+const darkModeIcon = document.getElementById('darkModeIcon');
+
+function setDarkMode(enabled) {
+    if (enabled) {
+        container.classList.add('dark-mode');
+        darkModeSwitch.checked = true;
+        darkModeIcon.textContent = '☀️';
+        localStorage.setItem('domtree_dark_mode', '1');
+    } else {
+        container.classList.remove('dark-mode');
+        darkModeSwitch.checked = false;
+        darkModeIcon.textContent = '🌙';
+        localStorage.setItem('domtree_dark_mode', '0');
+    }
+}
+if (darkModeSwitch) {
+    darkModeSwitch.addEventListener('change', () => setDarkMode(darkModeSwitch.checked));
+}
+// On load, apply saved preference
+if (localStorage.getItem('domtree_dark_mode') === '1') {
+    setDarkMode(true);
+} else {
+    setDarkMode(false);
+}
+
+// Accessibility checks
+function runAccessibilityChecks(node) {
+    const warnings = [];
+    // Check for missing alt on images
+    if (node.tagName === 'img' && (!node.attributes || !node.attributes.alt || node.attributes.alt.trim() === '')) {
+        warnings.push('Image element is missing alt text.');
+    }
+    // Check for missing label on form controls
+    const formTags = ['input', 'select', 'textarea'];
+    if (formTags.includes(node.tagName)) {
+        let hasLabel = false;
+        if (node.attributes && node.attributes.id) {
+            // Look for label[for=id] in the DOM
+            const label = document.querySelector(`label[for="${node.attributes.id}"]`);
+            if (label) hasLabel = true;
+        }
+        if (!hasLabel && (!node.attributes || !node.attributes['aria-label'])) {
+            warnings.push('Form control is missing a label or aria-label.');
+        }
+    }
+    // Check for poor contrast (simple check: background vs. text color)
+    // Only for elements with inline style or style attribute
+    if (node.attributes && node.attributes.style) {
+        try {
+            const style = node.attributes.style;
+            const bgMatch = style.match(/background(-color)?:\s*([^;]+)/i);
+            const colorMatch = style.match(/color:\s*([^;]+)/i);
+            if (bgMatch && colorMatch) {
+                const bg = bgMatch[2].trim();
+                const fg = colorMatch[1].trim();
+                if (bg && fg && !hasGoodContrast(bg, fg)) {
+                    warnings.push('Text may have poor color contrast with background.');
+                }
+            }
+        } catch (e) {}
+    }
+    return warnings;
+}
+// Simple contrast check (luminance difference)
+function hasGoodContrast(bg, fg) {
+    function hexToRgb(hex) {
+        hex = hex.replace('#', '');
+        if (hex.length === 3) hex = hex.split('').map(x => x + x).join('');
+        const num = parseInt(hex, 16);
+        return [num >> 16, (num >> 8) & 255, num & 255];
+    }
+    function luminance([r, g, b]) {
+        [r, g, b] = [r, g, b].map(x => x / 255);
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    }
+    try {
+        const bgRgb = hexToRgb(bg.replace(/[^#0-9a-f]/gi, ''));
+        const fgRgb = hexToRgb(fg.replace(/[^#0-9a-f]/gi, ''));
+        const diff = Math.abs(luminance(bgRgb) - luminance(fgRgb));
+        return diff > 0.4; // threshold
+    } catch (e) { return true; }
+}
+
 // Update status message
 function updateStatus(message,isError = false){
     statusMessage.textContent = message;
@@ -108,7 +194,7 @@ function renderBreadcrumbs(node) {
     });
 }
 
-// Show details in the details panel
+// Show details in the details panel (with accessibility warnings)
 function showDetailsPanel(node) {
     const panel = document.getElementById('detailsPanel');
     if (!node) {
@@ -120,6 +206,18 @@ function showDetailsPanel(node) {
     // Clear previous details except breadcrumbs
     panel.innerHTML = '<div id="breadcrumbs" class="breadcrumbs" style="margin-bottom:8px;"></div>';
     renderBreadcrumbs(node);
+    // Accessibility warnings
+    const accDiv = document.getElementById('accessibilityWarnings');
+    if (accDiv) accDiv.innerHTML = '';
+    let warnings = runAccessibilityChecks(node);
+    if (warnings.length > 0) {
+        if (accDiv) {
+            accDiv.style.display = 'block';
+            accDiv.innerHTML = warnings.map(w => `<div>⚠️ ${w}</div>`).join('');
+        }
+    } else if (accDiv) {
+        accDiv.style.display = 'none';
+    }
     panel.innerHTML += `
         <div><span class="details-label">Tag:</span> <span>${node.tagName}</span></div>
         <div><span class="details-label">ID:</span> <span>${node.id ? node.id : '<none>'}</span></div>
