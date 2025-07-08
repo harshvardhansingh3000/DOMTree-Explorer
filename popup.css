@@ -134,6 +134,7 @@ body {
     padding: 15px;
     background-color: #f8f9fa;
     min-width: 100%;
+    box-sizing: border-box;
 }
 
 .placeholder {
@@ -170,11 +171,16 @@ body {
     border-radius: 6px;
     border: 1px solid #e9ecef;
     padding: 10px;
+    min-width: fit-content;
+    display: block;
+    box-sizing: border-box;
 }
 
 /* Tree Nodes */
 .tree-node {
     margin: 2px 0;
+    white-space: nowrap;
+    overflow: visible;
 }
 
 .node-content {
@@ -186,6 +192,10 @@ body {
     transition: background-color 0.2s ease;
     font-size: 13px;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .node-content:hover {
